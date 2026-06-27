@@ -1,0 +1,27 @@
+name: Keep Hugging Face Space Alive
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wake Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          echo "Triggering Hugging Face Space restart..."
+          
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+            "https://huggingface.co/api/spaces/tpc-pascal/libracal/restart" \
+            -H "Authorization: Bearer $HF_TOKEN")
+          
+          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 201 ]; then
+            echo "Success: Space is running (HTTP $RESPONSE)."
+          else
+            echo "Error: API failed with HTTP status $RESPONSE"
+            exit 1
+          fi
