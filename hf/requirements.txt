@@ -1,0 +1,3 @@
+gradio==5.15.0
+pymupdf>=1.25.0
+pillow>=10.0.0
